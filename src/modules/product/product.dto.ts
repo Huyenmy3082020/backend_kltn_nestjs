@@ -76,3 +76,8 @@ export class ProductListDtoGetListResponse extends PaginateResponse<ProductListD
   @ApiProperty({ type: [ProductListDto] })
   declare data: ProductListDto[];
 }
+export class UpdateProductDto extends ProductDto {}
+export class ProductResponse extends CommonResponse<ProductDto> {
+  @ApiProperty({ type: ProductDto })
+  declare data: ProductDto;
+}
