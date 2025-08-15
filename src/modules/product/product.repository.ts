@@ -37,4 +37,18 @@ export class ProductRepository {
     const product = this.productRepository.create(createProduct);
     return this.productRepository.save(product);
   }
+  async findOne(id: string): Promise<Product | null> {
+    return this.productRepository.findOne({ where: { id } });
+  }
+
+  async save(product: Product): Promise<Product> {
+    return this.productRepository.save(product);
+  }
+  async update(product: Product): Promise<Product> {
+    return this.productRepository.save(product);
+  }
+
+  async remove(product: Product): Promise<void> {
+    await this.productRepository.remove(product);
+  }
 }
