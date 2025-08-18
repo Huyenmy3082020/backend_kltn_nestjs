@@ -8,16 +8,15 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  if (process.env.NODE_ENV !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('RBAC API')
-      .setDescription('API documentation for RBAC example')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('documents', app, document);
-  }
+  // Swagger setup - Sẽ chạy trên mọi môi trường
+  const config = new DocumentBuilder()
+    .setTitle('RBAC API')
+    .setDescription('API documentation for RBAC example')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('documents', app, document);
 
   await app.listen(process.env.PORT ?? 8000);
 }
