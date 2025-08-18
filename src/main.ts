@@ -8,17 +8,14 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  if (process.env.NODE_ENV !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('RBAC API')
-      .setDescription('API documentation for RBAC example')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('documents', app, document);
-  }
-
+  const config = new DocumentBuilder()
+    .setTitle('RBAC API')
+    .setDescription('API documentation for RBAC example')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('documents', app, document);
   await app.listen(process.env.PORT ?? 8000);
 }
 bootstrap();
