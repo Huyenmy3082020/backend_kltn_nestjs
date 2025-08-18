@@ -26,6 +26,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ErrorResponse } from 'src/base/common.response';
+import { Public } from 'src/decorator/public.decorator';
 
 @ApiTags('products')
 @ApiBearerAuth()
@@ -33,6 +34,7 @@ import { ErrorResponse } from 'src/base/common.response';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Public()
   @Get()
   async getProducts(
     @Query() query: ProductQueryDTO,
