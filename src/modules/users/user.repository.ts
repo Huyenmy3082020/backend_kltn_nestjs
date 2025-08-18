@@ -41,4 +41,18 @@ export class UserRepository {
 
     return user || null;
   }
+  async registerUser(saveUser): Promise<User> {
+    const userEntity = this.userRepository.create({
+      email: saveUser.email,
+      username: saveUser.username,
+      fullname: saveUser.fullname,
+    });
+
+    return this.userRepository.save(userEntity);
+  }
+  getUser(email: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { email, status: Not(UserStatus.DELETED) },
+    });
+  }
 }

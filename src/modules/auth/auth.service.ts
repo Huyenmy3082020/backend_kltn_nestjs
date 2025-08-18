@@ -1,41 +1,69 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as jwt from 'jsonwebtoken';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { FirebaseAdminService } from './firebase-admin.service';
+import { RegisterUserDto } from './auth.dto';
+import { UserRepository } from '../users/user.repository';
 import { UserService } from '../users/user.service';
+import { UserStatus } from '../users/user.entity';
+import { TransactionService } from 'src/database/transaction.service';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class AuthService {
-  private readonly JWT_SECRET;
-  private readonly JWT_EXPIRES_IN: string;
-
   constructor(
-    private readonly configService: ConfigService,
+    private readonly firebaseAdmin: FirebaseAdminService,
     private readonly userService: UserService,
-  ) {
-    this.JWT_SECRET = this.configService.get<string>('JWT_SECRET');
-    this.JWT_EXPIRES_IN =
-      this.configService.get<string>('JWT_EXPIRES_IN') || '1h';
-  }
+    private readonly transactionService: TransactionService,
+  ) {}
 
-  async login(email: string) {
-    const user = await this.userService.getProfile(email);
-    if (!user?.data) {
-      throw new UnauthorizedException('Email không tồn tại');
+  async login(idToken: string) {
+    try {
+      const decodedToken = await this.firebaseAdmin
+        .getAuth()
+        .verifyIdToken(idToken);
+
+      // Lấy thông tin user từ decodedToken
+      const user = {
+        uid: decodedToken.uid,
+        email: decodedToken.email,
+        name: decodedToken.name,
+      };
+
+      return {
+        accessToken: idToken, // client đã có token từ Firebase
+        user,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid Firebase token');
     }
-
-    const payload = {
-      id: user.data.id,
-      username: user.data.username,
-      email: user.data.email,
+  }
+  async register(userRegisterDto: RegisterUserDto) {
+    const saveUser = {
+      email: userRegisterDto.email,
+      username: userRegisterDto.username,
     };
 
-    const accessToken = jwt.sign(payload, this.JWT_SECRET, {
-      expiresIn: this.JWT_EXPIRES_IN,
+    const existingUser = await this.userService.getUser(userRegisterDto.email);
+    if (existingUser) {
+      throw new BadRequestException('AUTH.USER_ALREADY_EXISTS');
+    }
+
+    const registerUser = await this.userService.registerUser(saveUser);
+    await this.firebaseAdmin.getAuth().createUser({
+      email: userRegisterDto.email,
+      password: userRegisterDto.password,
+      displayName: userRegisterDto.username,
     });
 
     return {
-      accessToken,
-      user: payload,
+      success: true,
+      message: 'REGISTER.SUSSESSFULY',
+      data: registerUser,
     };
   }
 }
