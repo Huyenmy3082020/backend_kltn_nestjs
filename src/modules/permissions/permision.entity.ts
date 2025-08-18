@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
 import { Role } from '../roles/role.entity';
+import { BaseEntity } from '../../base/base.entity';
 export enum ALLOWED_METHODS {
   GET = 'GET',
   POST = 'POST',

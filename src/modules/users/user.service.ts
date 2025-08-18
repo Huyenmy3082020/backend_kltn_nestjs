@@ -59,4 +59,10 @@ export class UserService extends BaseService {
     }
     return user;
   }
+  async registerUser(saveUser): Promise<User> {
+    return this.userRepository.registerUser(saveUser);
+  }
+  async getUser(email: string): Promise<User | null> {
+    return this.userRepository.getUser(email);
+  }
 }

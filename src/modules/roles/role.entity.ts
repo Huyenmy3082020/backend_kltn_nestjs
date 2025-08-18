@@ -1,21 +1,14 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm';
 import { on } from 'events';
 import { User } from '../users/user.entity';
 import { Permission } from '../permissions/permision.entity';
+import { BaseEntity } from '../../base/base.entity';
 
 export enum RoleGroup {
   HAUDI = 'HAUDI',
   ORGANIZATION = 'ORGANIZATION',
   FACILITY = 'FACILITY',
 }
-
 @Entity('role')
 export class Role extends BaseEntity {
   @PrimaryColumn({ type: 'varchar' })

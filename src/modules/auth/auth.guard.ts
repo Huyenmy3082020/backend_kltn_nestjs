@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from '../users/user.service';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../decorator/public.decorator';
+import { FirebaseAdminService } from './firebase-admin.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -21,6 +22,7 @@ export class AuthGuard implements CanActivate {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly reflector: Reflector,
+    private readonly firebaseAdmin: FirebaseAdminService,
   ) {
     this.JWT_SECRET = this.configService.get<string>('JWT_SECRET');
     if (!this.JWT_SECRET) {
@@ -38,26 +40,33 @@ export class AuthGuard implements CanActivate {
 
     const request: Request = context.switchToHttp().getRequest();
     const token: string | undefined =
-      request.cookies?.accessToken ||
-      request.headers['authorization']?.split(' ')[1];
+      request.headers['authorization']?.split(' ')[1] ||
+      request.cookies?.idToken;
 
     if (!token) {
       console.log('❌ No token provided');
       throw new UnauthorizedException('No token provided');
     }
 
-    let decoded: any;
+    let decodedToken: any;
     try {
-      decoded = jwt.verify(token, this.JWT_SECRET);
+      // Verify token Firebase
+      decodedToken = await this.firebaseAdmin.getAuth().verifyIdToken(token);
     } catch (err) {
-      console.log('❌ Invalid token', err);
-      throw new UnauthorizedException('Invalid token');
+      console.log('❌ Invalid Firebase token', err);
+      throw new UnauthorizedException('Invalid Firebase token');
     }
 
-    console.log('✅ Token decoded:', decoded);
+    console.log('✅ Firebase token decoded:', decodedToken);
 
-    const userProfile = (await this.userService.getProfile(decoded.email)).data;
+    // Lấy user từ DB theo email
+    const userProfile = (await this.userService.getProfile(decodedToken.email))
+      .data;
+    if (!userProfile) {
+      throw new UnauthorizedException('User not found in database');
+    }
 
+    // Kiểm tra permission
     await this.checkUserPermissions(request, userProfile);
 
     return true;
