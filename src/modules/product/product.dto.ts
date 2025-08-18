@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { CommonResponse, PaginateResponse } from 'src/base/common.response';
+import { CommonResponse, PaginateResponse } from '../../base/common.response';
 
 export class ProductDto {
   @ApiProperty({ example: 'Laptop Dell XPS 15', description: 'Tên sản phẩm' })

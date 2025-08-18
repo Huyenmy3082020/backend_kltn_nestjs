@@ -1,4 +1,4 @@
-import { CommonResponse, PaginateResponse } from 'src/base/common.response';
+import { CommonResponse, PaginateResponse } from '../base/common.response';
 
 export class ResponseHelper {
   /**

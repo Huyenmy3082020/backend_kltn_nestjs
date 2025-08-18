@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { Public } from 'src/decorator/public.decorator';
 import { RegisterUserDto, UserResponseDto } from './auth.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ErrorResponse } from 'src/base/common.response';
+import { ErrorResponse } from '../../base/common.response';
 
 @Controller('auth')
 export class AuthController {

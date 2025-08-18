@@ -25,7 +25,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ErrorResponse } from 'src/base/common.response';
+import { ErrorResponse } from '../../base/common.response';
+
 import { Public } from 'src/decorator/public.decorator';
 
 @ApiTags('products')

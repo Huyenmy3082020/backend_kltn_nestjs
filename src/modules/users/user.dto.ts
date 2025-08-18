@@ -11,7 +11,7 @@ import {
 import { UserStatus } from './user.entity';
 import { RoleGroup } from '../roles/role.entity';
 import { Transform } from 'class-transformer';
-import { CommonResponse, PaginateResponse } from 'src/base/common.response';
+import { CommonResponse, PaginateResponse } from '../../base/common.response';
 
 class UserDto {
   @ApiProperty({

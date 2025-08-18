@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ResponseHelper } from './response.helper';
-import { CommonResponse, PaginateResponse } from 'src/base/common.response';
+import { CommonResponse, PaginateResponse } from '../base/common.response';
 
 /**
  * Base service class providing common response utilities
