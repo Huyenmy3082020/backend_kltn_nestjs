@@ -13,10 +13,8 @@ export class FirebaseAdminService {
         'src/cert/serviceAccountKey.json',
         'utf-8',
       );
-      console.log('Reading serviceAccountKey.json...');
 
       const serviceAccount = JSON.parse(serviceAccountRaw);
-      console.log('Service Account:', serviceAccount);
 
       this.defaultApp = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
