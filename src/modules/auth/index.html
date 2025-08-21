@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Firebase Login & Get ID Token</title>
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js';
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+      } from 'https://www.gstatic.com/firebasejs/10.6.1/firebase-auth.js';
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAc93WB7m1nmRpn3AB2ElbEyX1yjNcbCfk',
+        authDomain: 'test-628d4.firebaseapp.com',
+        projectId: 'test-628d4',
+        storageBucket: 'test-628d4.firebasestorage.app',
+        messagingSenderId: '750822753336',
+        appId: '1:750822753336:web:760e6df32acf438b2652cd',
+        measurementId: 'G-JBRYXNGKR4',
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password,
+          );
+          const idToken = await userCredential.user.getIdToken();
+          console.log('ID Token:', idToken);
+          alert('ID Token đã được tạo, xem console để copy');
+
+          // Ví dụ gọi backend login
+
+          const res = await fetch('http://localhost:8000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+          });
+          const data = await res.json();
+          console.log('Backend response:', data);
+        } catch (err) {
+          console.error(err);
+          alert('Login thất bại: ' + err.message);
+        }
+      }
+
+      window.login = login;
+    </script>
+  </head>
+  <body>
+    <h1>Firebase Login & Get ID Token</h1>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login & Get ID Token</button>
+  </body>
+</html>

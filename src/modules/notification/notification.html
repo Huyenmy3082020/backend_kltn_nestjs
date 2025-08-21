@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WebSocket Test with AccessToken</title>
+    <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>WebSocket Notification Test</h1>
+    <label
+      >Access Token:
+      <input type="text" id="accessToken" value="YOUR_ACCESS_TOKEN_HERE"
+    /></label>
+    <button onclick="connect()">Connect</button>
+
+    <ul id="notifications"></ul>
+
+    <script>
+      let socket;
+
+      function connect() {
+        const token = document.getElementById('accessToken').value;
+
+        // Truyền token khi connect
+        socket = io('http://localhost:8000', {
+          auth: { token },
+        });
+
+        socket.on('connect', () => {
+          console.log('Connected to server with token');
+        });
+
+        socket.on('notification', (data) => {
+          console.log('Notification received:', data);
+          const li = document.createElement('li');
+          li.innerText = `[${new Date(data.timestamp).toLocaleTimeString()}] ${data.message}`;
+          document.getElementById('notifications').appendChild(li);
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Connection error:', err.message);
+        });
+      }
+    </script>
+  </body>
+</html>
