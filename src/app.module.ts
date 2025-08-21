@@ -10,15 +10,23 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/auth.guard';
 import { FirebaseAdminService } from './modules/auth/firebase-admin.service';
 import { FileModule } from './modules/file/file.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'), // thư mục public
+      serveRoot: '/', // URL root
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     UserModule,
     AuthModule,
     ProductModule,
     FileModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

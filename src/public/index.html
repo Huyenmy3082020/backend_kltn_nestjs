@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Firebase Login & WebSocket Notification</title>
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js';
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+      } from 'https://www.gstatic.com/firebasejs/10.6.1/firebase-auth.js';
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAc93WB7m1nmRpn3AB2ElbEyX1yjNcbCfk',
+        authDomain: 'test-628d4.firebaseapp.com',
+        projectId: 'test-628d4',
+        storageBucket: 'test-628d4.firebasestorage.app',
+        messagingSenderId: '750822753336',
+        appId: '1:750822753336:web:760e6df32acf438b2652cd',
+        measurementId: 'G-JBRYXNGKR4',
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      let idToken = '';
+
+      async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password,
+          );
+          idToken = await userCredential.user.getIdToken();
+          console.log('ID Token:', idToken);
+          alert('Đăng nhập thành công!');
+
+          // Hiển thị token cho user copy nếu muốn
+          document.getElementById('accessToken').value = idToken;
+        } catch (err) {
+          console.error(err);
+          alert('Login thất bại: ' + err.message);
+        }
+      }
+
+      window.login = login;
+    </script>
+
+    <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+    <script>
+      let socket;
+
+      function connectSocket() {
+        const token = document.getElementById('accessToken').value;
+        if (!token) {
+          alert('Vui lòng đăng nhập trước!');
+          return;
+        }
+
+        socket = io('http://localhost:8000', { auth: { token } });
+
+        socket.on('connect', () => {
+          console.log('Connected to server with token');
+        });
+
+        socket.on('notification', (data) => {
+          console.log('Notification received:', data);
+          const li = document.createElement('li');
+          li.innerText = `[${new Date(data.timestamp).toLocaleTimeString()}] ${data.message}`;
+          document.getElementById('notifications').appendChild(li);
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Connection error:', err.message);
+        });
+      }
+
+      window.connectSocket = connectSocket;
+    </script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f4f4f9;
+      }
+      h1 {
+        color: #333;
+      }
+      input {
+        padding: 8px;
+        margin: 5px;
+        width: 250px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+      button {
+        padding: 8px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        border: none;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      #notifications {
+        margin-top: 20px;
+        padding-left: 0;
+        list-style: none;
+      }
+      #notifications li {
+        background: #fff;
+        margin-bottom: 5px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Firebase Login & WebSocket Notifications</h1>
+
+    <h3>Login</h3>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+
+    <h3>Connect WebSocket</h3>
+    <input
+      type="text"
+      id="accessToken"
+      placeholder="ID Token sẽ xuất hiện ở đây"
+      readonly
+    />
+    <button onclick="connectSocket()">Connect Socket</button>
+
+    <ul id="notifications"></ul>
+  </body>
+</html>

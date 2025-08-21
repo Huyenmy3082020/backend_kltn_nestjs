@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
-import { Express } from 'express';
+import { validateFile } from 'src/filter/validateFile';
 
 @Injectable()
 export class FileService {
@@ -10,6 +10,8 @@ export class FileService {
   );
 
   async uploadFile(file: Express.Multer.File) {
+    await validateFile(file);
+
     const filePath = `uploads/${Date.now()}-${file.originalname}`;
 
     const { data, error } = await this.supabase.storage
@@ -20,14 +22,14 @@ export class FileService {
       });
 
     if (error) {
-      // Convert thành HttpException chuẩn
       throw new HttpException(
-        error.message || 'Upload failed',
-        HttpStatus.BAD_REQUEST,
+        'UPLOAD_FAILED',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
 
     return {
+      susscess: true,
       path: filePath,
       data,
       publicUrl: this.getPublicUrl(filePath),
